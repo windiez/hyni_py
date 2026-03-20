@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Callable, Any
+from typing import Optional, Dict, Callable, Any, Union
 from abc import ABC, abstractmethod
 
 # Import from local module with relative import
@@ -17,7 +17,7 @@ class HttpClientFactory:
 
     @staticmethod
     def create_http_client(context: 'GeneralContext',
-                          client_type: str = HttpClientType.AUTO) -> HttpClient:
+                          client_type: str | None = HttpClientType.AUTO) -> HttpClient:
         """
         Create an HTTP client instance
 
