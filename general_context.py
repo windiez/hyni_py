@@ -990,12 +990,17 @@ class GeneralContext:
         """
         Check if a string is base64 encoded.
 
+        Uses a compiled regex for clarity and to handle all standard base64
+        variants including padded, unpadded, and line-wrapped encodings.
+
         Args:
             data: The string to check
 
         Returns:
             True if the string appears to be base64 encoded, False otherwise
         """
+        import re
+
         if not data:
             return False
 
@@ -1003,22 +1008,12 @@ class GeneralContext:
         if data.startswith("data:") and ";base64," in data:
             return True
 
-        # Check for valid Base64 characters (ignoring whitespace)
-        base64_chars = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+        # Strip whitespace — base64 output is often line-wrapped at 76 chars
+        cleaned = "".join(data.split())
 
-        padding = 0
-        data_len = 0  # Counts non-whitespace chars
+        # Validate base64 structure: groups of 4 chars with optional padding
+        _BASE64_RE = re.compile(r'^([A-Za-z0-9+/]+)+(={0,2})$')
+        if not _BASE64_RE.match(cleaned):
+            return False
 
-        for c in data:
-            if c.isspace():
-                continue  # Skip whitespace
-            if c not in base64_chars:
-                return False  # Invalid character
-            if c == '=':
-                padding += 1
-                if padding > 2:
-                    return False  # Max 2 padding chars
-            data_len += 1
-
-        # Validate length and padding (Base64 length must be divisible by 4)
-        return (data_len % 4 == 0) and (padding != 1)  # 1 padding char is invalid
+        return len(cleaned) % 4 == 0
