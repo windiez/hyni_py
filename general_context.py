@@ -499,8 +499,10 @@ class GeneralContext:
         Returns:
             Dictionary representing the API request
         """
-        request = self._request_template.copy()
-        messages = self._messages.copy()  # Work with a copy to avoid modifying internal state
+        # The request template is populated once at schema load time and is
+        # read-only thereafter — copying it every call is unnecessary overhead.
+        request = self._request_template
+        messages = list(self._messages)  # Messages still need a copy for potential insertion
 
         # Set model
         if self._model_name:
