@@ -5,6 +5,15 @@ This module provides utilities for managing multiple provider schemas and
 creating contexts efficiently with caching support.
 """
 
+__all__ = [
+    "SchemaRegistry",
+    "ContextFactory",
+    "ProviderContext",
+    "CacheStats",
+    "create_registry_from_directory",
+    "create_factory_with_defaults",
+]
+
 import json
 import threading
 from pathlib import Path
