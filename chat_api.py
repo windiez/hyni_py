@@ -100,7 +100,14 @@ class ChatApi:
         )
 
         if not response.success:
-            raise FailedApiResponse(response.error_message)
+            # Include provider context and a key suffix to help identify which
+            # credential failed in deployments that rotate or pool multiple API keys.
+            # Only the last 8 characters are included — insufficient to reconstruct
+            # the full key but enough to match against a known key inventory.
+            key_diag = ""
+            if self._context._api_key:
+                key_diag = f", key=...{self._context._api_key[-8:]}"
+            raise FailedApiResponse(f"{response.error_message} [provider={self._context.get_provider_name()}{key_diag}]")
 
         try:
             json_response = json.loads(response.body)
