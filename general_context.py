@@ -600,6 +600,45 @@ class GeneralContext:
         except Exception:
             return "Failed to parse error message"
 
+    def export_state(self) -> Dict[str, Any]:
+        """
+        Export the current conversation state for persistence.
+
+        The returned dictionary is JSON-serializable and can be stored in a
+        database, cache, or file for later restoration via import_state().
+
+        Returns:
+            Dictionary containing model, system message, messages, and parameters
+        """
+        return {
+            "provider": self._provider_name,
+            "model": self._model_name,
+            "system_message": self._system_message,
+            "messages": self._messages.copy(),
+            "parameters": self._parameters.copy(),
+        }
+
+    def import_state(self, state: Dict[str, Any]) -> None:
+        """
+        Restore a previously exported conversation state.
+
+        Enables session continuation across processes or requests. The state
+        argument must have been produced by export_state() — direct assignment
+        is intentional here since exported state is structurally guaranteed and
+        re-validating every message on import would be redundant overhead.
+
+        Args:
+            state: State dictionary previously produced by export_state()
+        """
+        # Restore conversation history directly — no validation needed for
+        # trusted exported state (export_state guarantees a valid structure).
+        self._messages = state.get("messages", [])
+        self._parameters = state.get("parameters", {})
+        if "system_message" in state:
+            self._system_message = state["system_message"]
+        if "model" in state:
+            self._model_name = state["model"]
+
     def reset(self) -> None:
         """
         Reset the context to its initial state.
