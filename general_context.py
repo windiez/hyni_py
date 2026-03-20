@@ -630,7 +630,7 @@ class GeneralContext:
         Check if an API key has been set.
 
         Returns:
-            True if an API key is set, False otherwise
+            True if a non-empty API key has been configured, False otherwise.
         """
         return bool(self._api_key)
 

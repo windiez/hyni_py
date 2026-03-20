@@ -137,7 +137,7 @@ class CacheStats:
 
     @property
     def hit_rate(self) -> float:
-        """Calculate cache hit rate."""
+        """Calculate cache hit rate as a value between 0.0 and 1.0."""
         total = self.hit_count + self.miss_count
         return self.hit_count / total if total > 0 else 0.0
 
