@@ -1,10 +1,5 @@
 """
 Security regression tests for hyni_py.
-
-These tests verify correct behaviour for each known security issue.
-Run before and after applying fixes to confirm:
-  - BEFORE fixes: tests marked VULN_* fail or expose the bug
-  - AFTER fixes:  all tests pass
 """
 
 import sys
