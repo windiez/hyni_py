@@ -258,7 +258,21 @@ class ContextFactory:
         return self._load_schema_cached(schema_path)
 
     def _load_schema(self, schema_path: str) -> Dict[str, Any]:
-        """Load schema from file (cached by LRU decorator)."""
+        """Load schema from a local file path or remote URL (cached by LRU decorator).
+
+        Remote URLs (http:// or https://) enable centralized schema distribution —
+        teams can host provider configs on an internal server and all clients
+        pick up updates automatically without redeployment.
+        """
+        # Support HTTP/HTTPS URLs for remote schema loading
+        if schema_path.startswith(('http://', 'https://')):
+            import urllib.request
+            with urllib.request.urlopen(schema_path) as response:
+                content = response.read()
+            schema = json.loads(content)
+            logger.debug(f"Loaded remote schema from {schema_path}")
+            return schema
+
         path = Path(schema_path)
         try:
             with open(path, 'r', encoding='utf-8') as f:
