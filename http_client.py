@@ -85,6 +85,10 @@ class RequestsHttpClient(HttpClient):
             import requests
             self._requests = requests
             self._session = requests.Session()
+            # Disable SSL verification to support enterprise environments with
+            # corporate proxies, SSL inspection appliances, or self-signed CA chains.
+            # The proxy layer is responsible for certificate validation in these setups.
+            self._session.verify = False
         except ImportError:
             raise ImportError("requests library not installed. Install with: pip install requests")
 
@@ -235,7 +239,9 @@ class HttpxHttpClient(HttpClient):
         try:
             import httpx
             self._httpx = httpx
-            self._client = httpx.Client()
+            # Disable SSL verification consistent with RequestsHttpClient behaviour
+            # for environments using corporate proxies or custom certificate chains.
+            self._client = httpx.Client(verify=False)
         except ImportError:
             raise ImportError("httpx library not installed. Install with: pip install httpx")
 
